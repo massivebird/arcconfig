@@ -1,7 +1,7 @@
 use colored::{Colorize, ColoredString};
 use std::hash::Hash;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct System {
     pub pretty_string: ColoredString,
     pub directory: String,
