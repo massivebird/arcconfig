@@ -9,7 +9,7 @@ pub struct System {
 }
 
 impl System {
-    fn new(pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
+    pub fn new(pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
         System {
             directory: String::from(dir_name),
             pretty_string,
