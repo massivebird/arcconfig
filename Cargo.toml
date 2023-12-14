@@ -1,5 +1,5 @@
 [package]
-name = "archive_systems"
+name = "arcconfig"
 version = "0.1.0"
 edition = "2021"
 
