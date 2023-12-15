@@ -1,4 +1,5 @@
 use colored::{Colorize, ColoredString};
+use yaml_rust::Yaml;
 use std::hash::Hash;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -25,6 +26,39 @@ impl Hash for System {
     }
 }
 
+pub fn read_config(archive_root: &str) -> Vec<System> {
+    let yaml_path = String::from(archive_root) + "/config.yaml";
+    let read_to_string = std::fs::read_to_string(yaml_path).unwrap();
+    let data = &yaml_rust::YamlLoader::load_from_str(&read_to_string).unwrap()[0]["systems"];
+
+    let mut systems: Vec<System> = Vec::new();
+
+    for system in data.as_hash().unwrap().values() {
+        let display_name = system["display_name"].as_str().unwrap();
+        let color = system["color"].as_vec().unwrap();
+        let path = system["path"].as_str().unwrap();
+        let games_are_directories = system["games_are_directories"].as_bool().unwrap();
+
+        let nth_color = |n: usize| -> u8 {
+            color.get(n).unwrap().as_i64().unwrap() as u8
+        };
+
+        let display_name = display_name.truecolor(
+            nth_color(0),
+            nth_color(1),
+            nth_color(2)
+        );
+
+        systems.push(System::new(
+            display_name,
+            path,
+            games_are_directories,
+        ));
+    }
+
+    systems
+}
+
 pub fn generate_systems() -> [System; 13] {
     [
         System::new("3DS".truecolor(215,0,0), "3ds", false),
@@ -41,4 +75,42 @@ pub fn generate_systems() -> [System; 13] {
         System::new("SNES".truecolor(95,0,255), "snes", false),
         System::new("WII".truecolor(0,215,255), "wbfs", true),
     ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use yaml_rust::{YamlLoader, Yaml};
+
+    #[test]
+    fn reading_yaml() {
+        read_config("/home/penguino/game-archive")
+    }
+
+    #[test]
+    fn inline_yaml() {
+        let s = "
+systems:
+    wii:
+        display_name: WII
+        color: #0000FF
+        path: wbfs
+        games_are_directories: true
+    gamecube:
+        display_name: GCN
+        color: #00FFFF
+        path: games
+        games_are_directories: true
+    ds:
+        display_name: DS
+        color: #FF00FF
+        path: ds
+        games_are_directories: false
+";
+        let data = &YamlLoader::load_from_str(s).unwrap()[0]["systems"];
+
+        assert_eq!(data["wii"]["display_name"], Yaml::String("WII".to_string()));
+        assert_eq!(data["gamecube"]["path"], Yaml::String("games".to_string()));
+        assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
+    }
 }
