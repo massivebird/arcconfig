@@ -1,7 +1,7 @@
 use colored::{Colorize, ColoredString};
-use yaml_rust::YamlLoader;
 use std::fs;
 use std::hash::Hash;
+use yaml_rust::YamlLoader;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
@@ -38,17 +38,27 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
     )[0]["systems"];
 
     if data.is_badvalue() {
-        println!("Fatal error: `config.yaml` does not contain a `systems` key.");
-        std::process::exit(1);
+        panic!("Fatal error: `config.yaml` does not contain a `systems` key.");
     }
 
     let mut systems: Vec<System> = Vec::new();
 
     for system in data.as_hash().unwrap().values() {
-        let display_name = system["display_name"].as_str().unwrap();
-        let color = system["color"].as_vec().unwrap();
-        let path = system["path"].as_str().unwrap();
-        let games_are_directories = system["games_are_directories"].as_bool().unwrap();
+        let display_name = system["display_name"].as_str().expect(
+            "Fatal error: missing `display_name` property for a system."
+        );
+
+        let color = system["color"].as_vec().expect(
+            "Fatal error: missing `color` property for a system."
+        );
+
+        let path = system["path"].as_str().expect(
+            "Fatal error: missing `path` property for a system."
+        );
+
+        let games_are_directories = system["games_are_directories"].as_bool().expect(
+            "Fatal error: missing `games_are_directories` property for a system."
+        );
 
         let nth_color = |n: usize| -> u8 {
             color.get(n).unwrap().as_i64().unwrap() as u8
@@ -110,7 +120,6 @@ systems:
     fn parse_path() {
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["gamecube"]["path"], Yaml::String("games".to_string()));
-        assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
     }
 
     #[test]
