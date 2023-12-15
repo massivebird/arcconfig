@@ -74,30 +74,49 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
 mod tests {
     use yaml_rust::{YamlLoader, Yaml};
 
-    #[test]
-    fn inline_yaml() {
-        let s = "
+    const DEMO: &str = "
 systems:
     wii:
         display_name: WII
-        color: #0000FF
+        color: [0,255,0]
         path: wbfs
         games_are_directories: true
     gamecube:
         display_name: GCN
-        color: #00FFFF
+        color: [62,255,0]
         path: games
         games_are_directories: true
     ds:
         display_name: DS
-        color: #FF00FF
+        color: [0,255,55]
         path: ds
         games_are_directories: false
 ";
-        let data = &YamlLoader::load_from_str(s).unwrap()[0]["systems"];
 
+    #[test]
+    fn parse_display_name() {
+        let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["wii"]["display_name"], Yaml::String("WII".to_string()));
+    }
+
+    #[test]
+    fn parse_color() {
+        let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
+        let color_vec = data["wii"]["color"].as_vec().unwrap();
+        assert_eq!(color_vec.get(1).unwrap().as_i64().unwrap(), 255);
+    }
+
+    #[test]
+    fn parse_path() {
+        let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["gamecube"]["path"], Yaml::String("games".to_string()));
         assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
     }
+
+    #[test]
+    fn parse_games_are_directories() {
+        let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
+        assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
+    }
+
 }
