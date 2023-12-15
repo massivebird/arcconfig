@@ -3,7 +3,7 @@ use yaml_rust::YamlLoader;
 use std::fs;
 use std::hash::Hash;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
     pub pretty_string: ColoredString,
     pub directory: String,
