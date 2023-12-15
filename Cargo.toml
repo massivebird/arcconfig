@@ -1,5 +1,5 @@
 [package]
-name = "archive_systems"
+name = "arcconfig"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 colored = "2.0.0"
+yaml-rust = "0.4.5"
