@@ -1,5 +1,6 @@
 use colored::{Colorize, ColoredString};
-use yaml_rust::Yaml;
+use yaml_rust::YamlLoader;
+use std::fs;
 use std::hash::Hash;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -28,8 +29,18 @@ impl Hash for System {
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
     let yaml_path = String::from(archive_root) + "/config.yaml";
-    let read_to_string = std::fs::read_to_string(yaml_path).unwrap();
-    let data = &yaml_rust::YamlLoader::load_from_str(&read_to_string).unwrap()[0]["systems"];
+    let read_to_string = fs::read_to_string(yaml_path).expect(
+        "Fatal error: `config.yaml` not found in archive root."
+    );
+
+    let data = &YamlLoader::load_from_str(&read_to_string).expect(
+        "Fatal error: `config.yaml` could not be parsed."
+    )[0]["systems"];
+
+    if data.is_badvalue() {
+        println!("Fatal error: `config.yaml` does not contain a `systems` key.");
+        std::process::exit(1);
+    }
 
     let mut systems: Vec<System> = Vec::new();
 
@@ -79,13 +90,7 @@ pub fn generate_systems() -> [System; 13] {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use yaml_rust::{YamlLoader, Yaml};
-
-    #[test]
-    fn reading_yaml() {
-        read_config("/home/penguino/game-archive")
-    }
 
     #[test]
     fn inline_yaml() {
