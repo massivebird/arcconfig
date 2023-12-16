@@ -1,6 +1,11 @@
 [package]
 name = "arcconfig"
-version = "0.1.0"
+description = "Facilitates querying of digital video game archives"
+version = "0.2.0"
+repository = "https://github.com/massivebird/arcconfig"
+license-file = "LICENSE"
+readme = "README.md"
+categories = ["config", "filesystem", "command-line-utilities"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

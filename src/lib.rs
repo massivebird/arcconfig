@@ -1,19 +1,23 @@
 use colored::{Colorize, ColoredString};
-use std::fs;
-use std::hash::Hash;
-use std::path::Path;
+use std::{
+    fs,
+    hash::Hash,
+    path::Path,
+};
 use yaml_rust::YamlLoader;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
+    pub label: String,
     pub pretty_string: ColoredString,
     pub directory: String,
     pub games_are_directories: bool,
 }
 
 impl System {
-    pub fn new(pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
+    pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
         System {
+            label: String::from(label),
             directory: String::from(dir_name),
             pretty_string,
             games_are_directories,
@@ -48,7 +52,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
 
     let mut systems: Vec<System> = Vec::new();
 
-    for system in data.as_hash().unwrap().values() {
+    for (label, system) in data.as_hash().unwrap().iter() {
         let display_name = system["display_name"].as_str().expect(
             "Missing `display_name` property for a system."
         );
@@ -76,6 +80,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         );
 
         systems.push(System::new(
+            label.as_str().unwrap(),
             display_name,
             path,
             games_are_directories,
@@ -131,6 +136,11 @@ systems:
     fn parse_games_are_directories() {
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
+    }
+
+    #[test]
+    fn can_read_config() {
+        super::read_config("/home/penguino/game-archive");
     }
 
 }
