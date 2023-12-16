@@ -29,35 +29,35 @@ impl Hash for System {
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
     let yaml_path = String::from(archive_root) + "/config.yaml";
-    let read_to_string = fs::read_to_string(yaml_path).expect(
-        "Fatal error: `config.yaml` not found in archive root."
+    let yaml_contents = fs::read_to_string(yaml_path).expect(
+        "`config.yaml` not found in archive root."
     );
 
-    let data = &YamlLoader::load_from_str(&read_to_string).expect(
-        "Fatal error: `config.yaml` could not be parsed."
+    let data = &YamlLoader::load_from_str(&yaml_contents).expect(
+        "`config.yaml` could not be parsed."
     )[0]["systems"];
 
     if data.is_badvalue() {
-        panic!("Fatal error: `config.yaml` does not contain a `systems` key.");
+        panic!("`config.yaml` does not contain a `systems` key.");
     }
 
     let mut systems: Vec<System> = Vec::new();
 
     for system in data.as_hash().unwrap().values() {
         let display_name = system["display_name"].as_str().expect(
-            "Fatal error: missing `display_name` property for a system."
+            "Missing `display_name` property for a system."
         );
 
         let color = system["color"].as_vec().expect(
-            "Fatal error: missing `color` property for a system."
+            "Missing `color` property for a system."
         );
 
         let path = system["path"].as_str().expect(
-            "Fatal error: missing `path` property for a system."
+            "Missing `path` property for a system."
         );
 
         let games_are_directories = system["games_are_directories"].as_bool().expect(
-            "Fatal error: missing `games_are_directories` property for a system."
+            "Missing `games_are_directories` property for a system."
         );
 
         let nth_color = |n: usize| -> u8 {
