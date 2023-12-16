@@ -30,7 +30,7 @@ impl Hash for System {
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
     if !Path::new(archive_root).exists() {
-        panic!("Path does not exist: {archive_root}");
+        panic!("Archive path does not exist: {archive_root}");
     }
 
     let yaml_path = String::from(archive_root) + "/config.yaml";
