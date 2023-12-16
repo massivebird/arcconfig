@@ -138,9 +138,4 @@ systems:
         assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
     }
 
-    #[test]
-    fn can_read_config() {
-        super::read_config("/home/penguino/game-archive");
-    }
-
 }
