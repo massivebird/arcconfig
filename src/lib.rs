@@ -1,6 +1,7 @@
 use colored::{Colorize, ColoredString};
 use std::fs;
 use std::hash::Hash;
+use std::path::Path;
 use yaml_rust::YamlLoader;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -28,6 +29,10 @@ impl Hash for System {
 }
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
+    if !Path::new(archive_root).exists() {
+        panic!("Archive path does not exist: {archive_root}");
+    }
+
     let yaml_path = String::from(archive_root) + "/config.yaml";
     let yaml_contents = fs::read_to_string(yaml_path).expect(
         "`config.yaml` not found in archive root."
