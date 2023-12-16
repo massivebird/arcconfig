@@ -2,6 +2,9 @@
 
 > short for "archive configuration"
 
+[![Crate](https://img.shields.io/crates/v/arcconfig)](https://crates.io/crates/arcconfig)
+[![GitHub License](https://img.shields.io/github/license/massivebird/arcconfig?color=blue)](https://github.com/massivebird/arcconfig/blob/main/LICENSE)
+
 This is a dependency for my [arcsearch](https://github.com/massivebird/arcsearch) and [arcstat](https://github.com/massivebird/arcstat) projects!
 
 🦀 written in Rust
