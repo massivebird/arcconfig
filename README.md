@@ -5,9 +5,16 @@
 [![Crate](https://img.shields.io/crates/v/arcconfig)](https://crates.io/crates/arcconfig)
 [![GitHub License](https://img.shields.io/github/license/massivebird/arcconfig?color=blue)](https://github.com/massivebird/arcconfig/blob/main/LICENSE)
 
-This is a dependency for my [arcsearch](https://github.com/massivebird/arcsearch) and [arcstat](https://github.com/massivebird/arcstat) projects!
-
 🦀 written in Rust
+
+## What is arcconfig?
+
+Arcconfig is for people who collect catalogues — or "archives" — of games in the form of ROMs, ISOs, etc.
+
+Arcconfig represents each game system in your archive as a distinct `System` instance, each of which contains data such as a display name and path (see: [Customization](#Customization)). This allows you to write cool Rust projects such as:
+
++ [massivebird/arcsearch](https://github.com/massivebird/arcsearch): queries archive with regex
++ [massivebird/arcstat](https://github.com/massivebird/arcstat): provides archive statistics
 
 ## Why a shared dependency?
 
@@ -15,11 +22,7 @@ Both projects interact with my digital video game archive in similar ways. The t
 
 This reduces code redundancy and provides a great place to start on new, similar projects.
 
-## Can I use it?
-
-Yes! Honor the licensing, or else this guy will get you → 🦖
-
-### Cool! So how do I use it?
+<h3 id="Customization">Customization</h3>
 
 First, you need a `config.yaml` file located in the root of your archive.
 
