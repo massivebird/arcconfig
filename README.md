@@ -16,17 +16,19 @@ Arcconfig represents each game system in your archive as a distinct `System` ins
 + [massivebird/arcsearch](https://github.com/massivebird/arcsearch): queries archive with regex
 + [massivebird/arcstat](https://github.com/massivebird/arcstat): provides archive statistics
 
-## Why a shared dependency?
+## How do I use it?
 
-Both projects interact with my digital video game archive in similar ways. The two can sensibly share one configuration!
+To use arcconfig in your own Rust project, you must first add it as a dependency.
 
-This reduces code redundancy and provides a great place to start on new, similar projects.
+One way you can do this according to [crates.io](https://crates.io/crates/arcconfig) is running this command in your project directory:
+
+```bash
+cargo add arcconfig
+```
 
 <h3 id="Customization">Customization</h3>
 
-First, you need a `config.yaml` file located in the root of your archive.
-
-The `read_config` function reads this file's contents and generates a collection of `System` instances!
+`arcconfig::read_config` parses a file called `config.yaml` located in your archive root. This function returns a collection of `System` instances based on that configuration!
 
 > For a quickstart on YAML syntax, click [here](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html).
 
