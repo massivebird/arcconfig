@@ -9,6 +9,11 @@ I'm new at this, so expect imperfection ;_; I'm trying!
 
 ## [Unreleased]
 
+### Added
+
++ Added more error messages (#14)
++ Added system label to system-specific error messages (#12)
+
 ### Removed
 
 + Removed test function that was causing GitHub Actions to fail
