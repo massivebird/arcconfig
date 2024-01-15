@@ -11,7 +11,9 @@
 
 Arcconfig is for people who collect catalogues — or "archives" — of games in the form of ROMs, ISOs, etc.
 
-Arcconfig represents each game system in your archive as a distinct `System` instance, each of which contains data such as a display name and path (see: [Customization](#Customization)). This allows you to write cool Rust projects such as:
+__Arcconfig provides a layer of abstraction over your archive, allowing you to interact with it via Rust!__
+
+Arcconfig represents each game system in your archive as `System` instances, each of which contains data such as a display name and path (see: [Customization](#Customization)). This allows you to write cool Rust projects such as:
 
 + [massivebird/arcsearch](https://github.com/massivebird/arcsearch): queries archive with regex
 + [massivebird/arcstat](https://github.com/massivebird/arcstat): provides archive statistics
