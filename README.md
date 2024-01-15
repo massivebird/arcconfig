@@ -55,3 +55,12 @@ systems:
 ```
 
 Feel free to use these `System` instances however you'd like!
+
+## Other arcosystem projects
+
+Arcconfig belongs to a family of projects called the arcosystem!
+
+See the projects that arcconfig makes possible:
+
++ [arcsearch](https://github.com/massivebird/arcsearch): game archive querying
++ [arcstat](https://github.com/massivebird/arcstat): game archive stats

@@ -18,6 +18,7 @@ I'm new at this, so don't expect it to be perfect ;_; I'm trying!
 + Added project synposis and purpose
 + Added instructions on adding arcconfig as a project dependency
 + Added cargo version and license [shields](https://shields.io)
++ Added links to arcosystem projects
 
 ### Miscellaneous
 
