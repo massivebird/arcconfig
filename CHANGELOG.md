@@ -5,13 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-I'm new at this, so don't expect it to be perfect ;_; I'm trying!
+I'm new at this, so expect imperfection ;_; I'm trying!
 
 ## [Unreleased]
 
 ### Removed
 
-+ Test function that was specific to my file system, was failing in GitHub Actions
++ Removed test function that was causing GitHub Actions to fail
 
 ### Documentation
 
@@ -22,4 +22,4 @@ I'm new at this, so don't expect it to be perfect ;_; I'm trying!
 
 ### Miscellaneous
 
-+ Added basic GitHub Actions to compile and test source code
++ Added basic GitHub Actions for automated testing
