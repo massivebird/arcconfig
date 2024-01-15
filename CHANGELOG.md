@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I'm new at this, so expect imperfection ;_; I'm trying!
 
-## [Unreleased]
+## [0.2.1] - 2023-01-14
 
 ### Added
 
@@ -21,7 +21,7 @@ I'm new at this, so expect imperfection ;_; I'm trying!
 ### Documentation
 
 + Added project synposis and purpose
-+ Added instructions on adding arcconfig as a project dependency
++ Added usage instructions as a project dependency
 + Added cargo version and license [shields](https://shields.io)
 + Added links to arcosystem projects
 
