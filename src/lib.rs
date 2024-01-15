@@ -52,25 +52,44 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
 
     let mut systems: Vec<System> = Vec::new();
 
-    for (label, system) in data.as_hash().unwrap().iter() {
-        let display_name = system["display_name"].as_str().expect(
-            "Missing `display_name` property for a system."
-        );
+    let declared_systems_iter = || {
+        data.as_hash().expect("something is seriously wrong with this yaml").iter()
+    };
 
-        let color = system["color"].as_vec().expect(
-            "Missing `color` property for a system."
-        );
+    for (label, system) in declared_systems_iter() {
+        let label = label
+            .as_str()
+            .expect("archive error: bad system label somewhere :3 idk");
 
-        let path = system["path"].as_str().expect(
-            "Missing `path` property for a system."
-        );
+        let error_msg = |msg: &str| -> String {
+            format!("archive error: system labeled `{label}`: {msg}")
+        };
 
-        let games_are_directories = system["games_are_directories"].as_bool().expect(
-            "Missing `games_are_directories` property for a system."
-        );
+        let display_name = system["display_name"]
+            .as_str()
+            .expect(&error_msg("missing `display_name` property"));
+
+        let color = system["color"]
+            .as_vec()
+            .expect(&error_msg("missing `color` property"));
+
+        let path = system["path"]
+            .as_str()
+            .expect(&error_msg("missing `path` property"));
+
+        let games_are_directories = system["games_are_directories"]
+            .as_bool()
+            .expect(&error_msg("missing `games_are_directories` property"));
+
+        let color_error_msg: &str = "unexpected `color` value. Expected: `[u8, u8, u8]`";
 
         let nth_color = |n: usize| -> u8 {
-            color.get(n).unwrap().as_i64().unwrap() as u8
+            color
+                .get(n)
+                .expect(&error_msg(color_error_msg))
+                .as_i64()
+                .expect(&error_msg(color_error_msg))
+            as u8
         };
 
         let display_name = display_name.truecolor(
@@ -80,7 +99,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         );
 
         systems.push(System::new(
-            label.as_str().unwrap(),
+            label,
             display_name,
             path,
             games_are_directories,
