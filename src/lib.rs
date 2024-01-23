@@ -41,7 +41,7 @@ pub mod system;
 ///   ds: # system "label" — call it whatever you want!
 ///     display_name: "DS"
 ///     color: [135,215,255]
-///     path: "ds" # path relative to archive root
+///     path: "ds" # path to system dir relative to archive root
 ///     games_are_directories: false # are games stored as directories?
 ///   snes:
 ///     display_name: "SNES"
