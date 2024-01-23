@@ -3,8 +3,68 @@ use self::system::System;
 use std::{fs, path::Path};
 use yaml_rust::YamlLoader;
 
-mod system;
+pub mod system;
 
+/// Returns a collection of `System` instances based on the archive's configuration file.
+///
+/// # Valid file system structure example
+///
+/// Follow these guidelines to reduce unexpected behavior when using this crate.
+///
+/// _Side note: A "system directory" is a directory that contains games for a single system._
+///
+/// Your archive's file structure is valid if:
+///
+/// + The configuration file is located in the archive root
+/// + System directories are never nested
+/// + For any system directory, games are represented as either normal files or directories (never both)
+///
+/// ```bash
+/// /game/archive/root
+/// ├── ds
+/// │   ├── game-1.nds
+/// │   ├── game-2.nds
+/// │   └── game-3.nds
+/// ├── wii
+/// │   ├── game-1-dir
+/// │   │   └── game-1.wbfs
+/// │   └── game-2-dir
+/// │       └── game-2.wbfs
+/// └── config.yaml
+/// ```
+///
+/// # Valid configuration file example
+///
+/// ```yaml
+/// # config.yaml in archive root
+/// systems:
+///   ds: # system "label" — call it whatever you want!
+///     display_name: "DS"
+///     color: [135,215,255]
+///     path: "ds" # path relative to archive root
+///     games_are_directories: false # are games stored as directories?
+///   snes:
+///     display_name: "SNES"
+///     color: [95,0,255]
+///     path: "snes"
+///     games_are_directories: false
+///   wii:
+///     display_name: "WII"
+///     color: [0,215,255]
+///     path: "wbfs"
+///     games_are_directories: true
+/// ```
+///
+/// # Panics
+///
+/// Will panic if any of the following are true:
+///
+/// + The provided `archive_root` path does not exist.
+/// + The configuration file
+///   + Cannot be found.
+///   + Does not contain the expected fields.
+///   + Contains a system with a nonexistent `path`.
+#[must_use]
 pub fn read_config(archive_root: &str) -> Vec<System> {
     assert!(Path::new(archive_root).exists(), "Path does not exist: {archive_root}");
 
@@ -28,7 +88,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             .iter()
     };
 
-    for (label, system) in declared_systems_iter() {
+    for (label, properties) in declared_systems_iter() {
         let label = label
             .as_str()
             // if the label cannot be parsed, then I'm not sure how to provide
@@ -42,7 +102,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         // macros enable parameterization of iterator adapters! See below:
         macro_rules! extract_property {
             ( $property_name: expr, $converter: ident ) => {
-                system[$property_name]
+                properties[$property_name]
                 .$converter() // this adapter is provided as a parameter!
                 .expect(&error_msg(&format!("missing `{}` property", $property_name)))
             }
@@ -52,6 +112,13 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         let color          = extract_property!("color", as_vec);
         let path           = extract_property!("path", as_str);
         let games_are_dirs = extract_property!("games_are_directories", as_bool);
+
+        let system_path = String::from(archive_root) + "/" + path;
+        let path_error_msg = format!("path `{path}` does not exist relative to archive root");
+
+        // I know this identation sucks. My auto-indent looks even worse ;_;
+        assert!(Path::new(&system_path).exists(),
+        "{}", error_msg(&path_error_msg));
 
         let color_error_msg: &str = &error_msg(
             "unexpected `color` value. Expected: `[u8, u8, u8]`"
@@ -105,6 +172,11 @@ systems:
         path: ds
         games_are_directories: false
 ";
+
+    // #[test]
+    // fn read_real() {
+    //     super::read_config("/home/penguino/game-archive");
+    // }
 
     #[test]
     fn parse_display_name() {

@@ -1,5 +1,14 @@
 use colored::ColoredString;
 
+/// An abstraction over a game system.
+///
+/// # Properties
+///
+/// + `label`: An arbitrary system label for identifying this system.
+/// + `pretty_string`: A `colored::ColoredString` for output purposes.
+/// + `dir_name`: the directory in which this system's games are stored (relative to the
+/// archive root).
+/// + `games_are_directories`: are this system's games represented as directories?
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
     pub label: String,
@@ -9,6 +18,9 @@ pub struct System {
 }
 
 impl System {
+    /// Creates a single `System` instance.
+    ///
+    /// This is a manual alternative to `read_config`.
     pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> Self {
         Self {
             label: String::from(label),
