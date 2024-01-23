@@ -11,7 +11,8 @@ I'm new at this, so expect imperfection ;_; I'm trying!
 
 ### Changed
 
-+ Changed `System` module visibility to public
++ __Breaking:__ extracted `System` struct to dedicated module
+  + Changes import path from `arcconfig::System` to `arcconfig::system::System`
 
 ### Documentation
 
