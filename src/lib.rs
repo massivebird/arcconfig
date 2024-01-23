@@ -1,36 +1,9 @@
-use colored::{Colorize, ColoredString};
-use std::{
-    fs,
-    hash::Hash,
-    path::Path,
-};
+use colored::Colorize;
+use self::system::System;
+use std::{fs, path::Path};
 use yaml_rust::YamlLoader;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct System {
-    pub label: String,
-    pub pretty_string: ColoredString,
-    pub directory: String,
-    pub games_are_directories: bool,
-}
-
-impl System {
-    pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
-        System {
-            label: String::from(label),
-            directory: String::from(dir_name),
-            pretty_string,
-            games_are_directories,
-        }
-    }
-}
-
-impl Hash for System {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.directory.hash(state);
-        self.games_are_directories.hash(state);
-    }
-}
+mod system;
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
     if !Path::new(archive_root).exists() {
@@ -53,12 +26,17 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
     let mut systems: Vec<System> = Vec::new();
 
     let declared_systems_iter = || {
-        data.as_hash().expect("something is seriously wrong with this yaml").iter()
+        data
+            .as_hash()
+            .expect("something is seriously wrong with this yaml")
+            .iter()
     };
 
     for (label, system) in declared_systems_iter() {
         let label = label
             .as_str()
+            // if the label cannot be parsed, then I'm not sure how to provide
+            // precise feedback about it
             .expect("archive error: bad system label somewhere :3 idk");
 
         let error_msg = |msg: &str| -> String {
