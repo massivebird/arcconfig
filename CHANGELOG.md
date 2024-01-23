@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I'm new at this, so expect imperfection ;_; I'm trying!
 
-## [0.2.1] - 2023-01-14
+## [0.3.0] - 2024-01-23
+
+### Changed
+
++ __Breaking:__ extracted `System` struct to dedicated module
+  + Changes import path from `arcconfig::System` to `arcconfig::system::System`
+
+### Documentation
+
++ Added inline rustdoc for `read_config` and `System` (#10)
++ Fixed incorrect dates in the changelog
+
+## [0.2.1] - 2024-01-14
 
 ### Added
 
