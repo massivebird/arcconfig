@@ -6,9 +6,7 @@ use yaml_rust::YamlLoader;
 mod system;
 
 pub fn read_config(archive_root: &str) -> Vec<System> {
-    if !Path::new(archive_root).exists() {
-        panic!("Archive path does not exist: {archive_root}");
-    }
+    assert!(Path::new(archive_root).exists(), "Path does not exist: {archive_root}");
 
     let yaml_path = String::from(archive_root) + "/config.yaml";
     let yaml_contents = fs::read_to_string(yaml_path).expect(
@@ -19,9 +17,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         "`config.yaml` could not be parsed."
     )[0]["systems"];
 
-    if data.is_badvalue() {
-        panic!("`config.yaml` does not contain a `systems` key.");
-    }
+    assert!(!data.is_badvalue(), "`config.yaml` does not contain a `systems` key.");
 
     let mut systems: Vec<System> = Vec::new();
 
@@ -59,15 +55,17 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             .as_bool()
             .expect(&error_msg("missing `games_are_directories` property"));
 
-        let color_error_msg: &str = "unexpected `color` value. Expected: `[u8, u8, u8]`";
+        let color_error_msg: &str = &error_msg(
+            "unexpected `color` value. Expected: `[u8, u8, u8]`"
+        );
 
         let nth_color = |n: usize| -> u8 {
-            color
+            u8::try_from(color
                 .get(n)
-                .expect(&error_msg(color_error_msg))
+                .unwrap_or_else(|| panic!("{color_error_msg}"))
                 .as_i64()
-                .expect(&error_msg(color_error_msg))
-            as u8
+                .unwrap_or_else(|| panic!("{color_error_msg}"))
+            ).unwrap_or_else(|_| panic!("{color_error_msg}"))
         };
 
         let display_name = display_name.truecolor(

@@ -9,8 +9,8 @@ pub struct System {
 }
 
 impl System {
-    pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> System {
-        System {
+    pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> Self {
+        Self {
             label: String::from(label),
             directory: String::from(dir_name),
             pretty_string,
