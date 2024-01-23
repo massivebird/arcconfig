@@ -39,21 +39,19 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             format!("archive error: system labeled `{label}`: {msg}")
         };
 
-        let display_name = system["display_name"]
-            .as_str()
-            .expect(&error_msg("missing `display_name` property"));
+        // macros enable parameterization of iterator adapters! See below:
+        macro_rules! extract_property {
+            ( $property_name: expr, $converter: ident ) => {
+                system[$property_name]
+                .$converter() // this adapter is provided as a parameter!
+                .expect(&error_msg(&format!("missing `{}` property", $property_name)))
+            }
+        }
 
-        let color = system["color"]
-            .as_vec()
-            .expect(&error_msg("missing `color` property"));
-
-        let path = system["path"]
-            .as_str()
-            .expect(&error_msg("missing `path` property"));
-
-        let games_are_directories = system["games_are_directories"]
-            .as_bool()
-            .expect(&error_msg("missing `games_are_directories` property"));
+        let display_name   = extract_property!("display_name", as_str);
+        let color          = extract_property!("color", as_vec);
+        let path           = extract_property!("path", as_str);
+        let games_are_dirs = extract_property!("games_are_directories", as_bool);
 
         let color_error_msg: &str = &error_msg(
             "unexpected `color` value. Expected: `[u8, u8, u8]`"
@@ -78,7 +76,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             label,
             display_name,
             path,
-            games_are_directories,
+            games_are_dirs,
         ));
     }
 
