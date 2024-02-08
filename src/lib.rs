@@ -116,9 +116,10 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         let system_path = String::from(archive_root) + "/" + path;
         let path_error_msg = format!("path `{path}` does not exist relative to archive root");
 
-        // I know this identation sucks. My auto-indent looks even worse ;_;
-        assert!(Path::new(&system_path).exists(),
-        "{}", error_msg(&path_error_msg));
+        assert!(
+            Path::new(&system_path).exists(),
+            "{}", error_msg(&path_error_msg)
+        );
 
         let color_error_msg: &str = &error_msg(
             "unexpected `color` value. Expected: `[u8, u8, u8]`"
