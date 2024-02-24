@@ -66,23 +66,30 @@ pub mod system;
 ///   + Contains a system with a nonexistent `path`.
 #[must_use]
 pub fn read_config(archive_root: &str) -> Vec<System> {
-    assert!(Path::new(archive_root).exists(), "Path does not exist: {archive_root}");
+    assert!(
+        Path::new(archive_root).exists(),
+        "Path does not exist: {archive_root}"
+    );
 
     let yaml_path = String::from(archive_root) + "/config.yaml";
     let yaml_contents = fs::read_to_string(yaml_path).expect(
         "`config.yaml` not found in archive root."
     );
 
-    let data = &YamlLoader::load_from_str(&yaml_contents).expect(
+    let systems_key = &YamlLoader::load_from_str(&yaml_contents).expect(
         "`config.yaml` could not be parsed."
     )[0]["systems"];
 
-    assert!(!data.is_badvalue(), "`config.yaml` does not contain a `systems` key.");
+    assert!(
+        !systems_key.is_badvalue(),
+        "`config.yaml` does not contain a `systems` key."
+    );
 
     let mut systems: Vec<System> = Vec::new();
 
+    // initializing this here to save indentation later
     let declared_systems_iter = || {
-        data
+        systems_key
             .as_hash()
             .expect("something is seriously wrong with this yaml")
             .iter()
@@ -104,7 +111,9 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             ( $property_name: expr, $converter: ident ) => {
                 properties[$property_name]
                 .$converter() // this adapter is provided as a parameter!
-                .expect(&error_msg(&format!("missing `{}` property", $property_name)))
+                .expect(
+                &error_msg(&format!("missing `{}` property", $property_name))
+                )
             }
         }
 
