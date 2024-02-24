@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I'm new at this, so expect imperfection ;_; I'm trying!
 
+## [0.3.1] - 2024-02-24
+
+### Changed
+
++ Changed some error messages to be more helpful
+  + New error message if `systems` key contains a value instead of a set of labels
+  + Prefixes all errors with "archive config error"
+
 ## [0.3.0] - 2024-01-23
 
 ### Changed

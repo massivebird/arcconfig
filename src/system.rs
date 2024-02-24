@@ -22,7 +22,13 @@ impl System {
     ///
     /// This is a manual alternative to `read_config`.
     #[must_use]
-    pub fn new(label: &str, pretty_string: ColoredString, dir_name: &str, games_are_directories: bool) -> Self {
+    pub fn new(
+        label: &str,
+        pretty_string: ColoredString,
+        dir_name: &str,
+        games_are_directories: bool
+    ) -> Self
+    {
         Self {
             label: String::from(label),
             directory: String::from(dir_name),

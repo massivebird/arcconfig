@@ -66,25 +66,36 @@ pub mod system;
 ///   + Contains a system with a nonexistent `path`.
 #[must_use]
 pub fn read_config(archive_root: &str) -> Vec<System> {
-    assert!(Path::new(archive_root).exists(), "Path does not exist: {archive_root}");
+    let error_msg = |msg: &str| -> String {
+        format!("archive config error: {msg}")
+    };
+
+    assert!(
+        Path::new(archive_root).exists(),
+        "{}", &error_msg(&format!("path does not exist: {archive_root}"))
+    );
 
     let yaml_path = String::from(archive_root) + "/config.yaml";
     let yaml_contents = fs::read_to_string(yaml_path).expect(
-        "`config.yaml` not found in archive root."
+        &error_msg(&format!("`config.yaml` not found in archive root."))
     );
 
-    let data = &YamlLoader::load_from_str(&yaml_contents).expect(
-        "`config.yaml` could not be parsed."
+    let systems_key = &YamlLoader::load_from_str(&yaml_contents).expect(
+        &error_msg(&format!("`config.yaml` could not be parsed."))
     )[0]["systems"];
 
-    assert!(!data.is_badvalue(), "`config.yaml` does not contain a `systems` key.");
+    assert!(
+        !systems_key.is_badvalue(),
+        "{}", &error_msg(&format!("`config.yaml` does not contain a `systems` key."))
+    );
 
     let mut systems: Vec<System> = Vec::new();
 
+    // initializing this here to save indentation later
     let declared_systems_iter = || {
-        data
+        systems_key
             .as_hash()
-            .expect("something is seriously wrong with this yaml")
+            .expect("`systems` contains a single value, expected a collection of labels")
             .iter()
     };
 
@@ -93,10 +104,10 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             .as_str()
             // if the label cannot be parsed, then I'm not sure how to provide
             // precise feedback about it
-            .expect("archive error: bad system label somewhere :3 idk");
+            .expect("archive config error: bad system label somewhere");
 
-        let error_msg = |msg: &str| -> String {
-            format!("archive error: system labeled `{label}`: {msg}")
+        let sys_error_msg = |msg: &str| -> String {
+            format!("archive config error: system labeled `{label}`: {msg}")
         };
 
         // macros enable parameterization of iterator adapters! See below:
@@ -104,7 +115,9 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             ( $property_name: expr, $converter: ident ) => {
                 properties[$property_name]
                 .$converter() // this adapter is provided as a parameter!
-                .expect(&error_msg(&format!("missing `{}` property", $property_name)))
+                .expect(
+                &sys_error_msg(&format!("missing `{}` property", $property_name))
+                )
             }
         }
 
@@ -116,21 +129,22 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
         let system_path = String::from(archive_root) + "/" + path;
         let path_error_msg = format!("path `{path}` does not exist relative to archive root");
 
-        // I know this identation sucks. My auto-indent looks even worse ;_;
-        assert!(Path::new(&system_path).exists(),
-        "{}", error_msg(&path_error_msg));
+        assert!(
+            Path::new(&system_path).exists(),
+            "{}", sys_error_msg(&path_error_msg)
+        );
 
-        let color_error_msg: &str = &error_msg(
+        let color_sys_error_msg: &str = &sys_error_msg(
             "unexpected `color` value. Expected: `[u8, u8, u8]`"
         );
 
         let nth_color = |n: usize| -> u8 {
             u8::try_from(color
                 .get(n)
-                .unwrap_or_else(|| panic!("{color_error_msg}"))
+                .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
                 .as_i64()
-                .unwrap_or_else(|| panic!("{color_error_msg}"))
-            ).unwrap_or_else(|_| panic!("{color_error_msg}"))
+                .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
+            ).unwrap_or_else(|_| panic!("{color_sys_error_msg}"))
         };
 
         let display_name = display_name.truecolor(
@@ -173,11 +187,6 @@ systems:
         games_are_directories: false
 ";
 
-    // #[test]
-    // fn read_real() {
-    //     super::read_config("/home/penguino/game-archive");
-    // }
-
     #[test]
     fn parse_display_name() {
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
@@ -202,5 +211,10 @@ systems:
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
     }
+
+    // #[test]
+    // fn read_real() {
+    //     super::read_config("/home/penguino/game-archive");
+    // }
 
 }
