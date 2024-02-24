@@ -187,11 +187,6 @@ systems:
         games_are_directories: false
 ";
 
-    // #[test]
-    // fn read_real() {
-    //     super::read_config("/home/penguino/game-archive");
-    // }
-
     #[test]
     fn parse_display_name() {
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
@@ -216,5 +211,10 @@ systems:
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["ds"]["games_are_directories"], Yaml::Boolean(false));
     }
+
+    // #[test]
+    // fn read_real() {
+    //     super::read_config("/home/penguino/game-archive");
+    // }
 
 }
