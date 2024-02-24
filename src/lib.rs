@@ -104,7 +104,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
             .as_str()
             // if the label cannot be parsed, then I'm not sure how to provide
             // precise feedback about it
-            .expect("archive error: bad system label somewhere");
+            .expect("archive config error: bad system label somewhere");
 
         let sys_error_msg = |msg: &str| -> String {
             format!("archive config error: system labeled `{label}`: {msg}")
