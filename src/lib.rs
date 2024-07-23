@@ -90,30 +90,25 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
 
     let mut systems: Vec<System> = Vec::new();
 
-    // initializing this here to save indentation later
-    let declared_systems_iter = || {
-        systems_key
-            .as_hash()
-            .expect("`systems` contains a single value, expected a collection of labels")
-            .iter()
-    };
-
-    for (label, properties) in declared_systems_iter() {
+    for (label, properties) in systems_key
+        .as_hash()
+        .expect("`systems` contains a single value, expected a collection of labels")
+        .iter()
+    {
         let label = label
             .as_str()
-            // if the label cannot be parsed, then I'm not sure how to provide
-            // precise feedback about it
+            // If the label cannot be parsed, then I'm not sure how to provide
+            // precise feedback about it.
             .expect("archive config error: bad system label somewhere");
 
         let sys_error_msg = |msg: &str| -> String {
             format!("archive config error: system labeled `{label}`: {msg}")
         };
 
-        // macros enable parameterization of iterator adapters! See below:
         macro_rules! extract_property {
             ( $property_name: expr, $converter: ident ) => {
                 properties[$property_name]
-                    .$converter() // this adapter is provided as a parameter!
+                    .$converter() // type conversion is declared at macro invocation
                     .expect(&sys_error_msg(&format!(
                         "missing `{}` property",
                         $property_name
