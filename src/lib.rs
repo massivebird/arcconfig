@@ -103,17 +103,18 @@ pub fn read_config(archive_root: &Path) -> Vec<System> {
         let label = sys_label
             .as_str()
             // If the label cannot be parsed, then I'm not sure how to provide
-            // precise feedback about it.
+            // precise feedback about it. Sorry >w<
             .expect("archive config error: bad system label somewhere");
 
         let sys_error_msg = |msg: &str| -> String {
             format!("archive config error: system labeled `{label}`: {msg}")
         };
 
+        // My magnum opus.
         macro_rules! extract_property {
             ( $property_name: expr, $converter: ident ) => {
                 properties[$property_name]
-                    .$converter() // type conversion is declared at macro invocation
+                    .$converter() // Type converter fn provided by macro invocation
                     .expect(&sys_error_msg(&format!(
                         "missing `{}` property",
                         $property_name
@@ -138,10 +139,14 @@ pub fn read_config(archive_root: &Path) -> Vec<System> {
             u8::try_from(
                 color
                     .get(n)
+                    // Panics if there are less than 3 values.
                     .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
                     .as_i64()
+                    // Panics if a value could not be read as an i32.
+                    // (Can't directly convert from `Yaml` to `u32`)
                     .unwrap_or_else(|| panic!("{color_sys_error_msg}")),
             )
+            // Panics if `i32` cannot be converted to a `u32`.
             .unwrap_or_else(|_| panic!("{color_sys_error_msg}"))
         };
 
