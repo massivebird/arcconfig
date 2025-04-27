@@ -66,39 +66,41 @@ pub mod system;
 ///   + Contains a system with a nonexistent `path`.
 #[must_use]
 pub fn read_config(archive_root: &Path) -> Vec<System> {
-    let error_msg = |msg: &str| -> String { format!("archive config error: {msg}") };
+    macro_rules! error_str {
+        ($($msg:tt)*) => {
+            format!("archive config error: {}", format!($($msg)*))
+        };
+    }
 
     let yaml_contents = {
         assert!(
             archive_root.exists(),
             "{}",
-            &error_msg(&format!("path does not exist: {}", archive_root.display()))
+            error_str!("path does not exist: {}", archive_root.display())
         );
 
         let yaml_path = archive_root.join("config.yaml");
 
-        fs::read_to_string(yaml_path).expect(&error_msg(&format!(
-            "`config.yaml` not found in archive root."
-        )))
+        fs::read_to_string(yaml_path)
+            .expect(&error_str!("`config.yaml` not found in archive root."))
     };
 
     let systems_key = &YamlLoader::load_from_str(&yaml_contents)
-        .expect(&error_msg(&format!("`config.yaml` could not be parsed.")))[0]["systems"];
+        .expect(&error_str!("`config.yaml` could not be parsed."))[0]["systems"];
 
     assert!(
         !systems_key.is_badvalue(),
         "{}",
-        &error_msg(&format!("`config.yaml` does not contain a `systems` key."))
+        error_str!("`config.yaml` does not contain a `systems` key.")
     );
 
     let mut systems: Vec<System> = Vec::new();
 
-    for (label, properties) in systems_key
+    for (sys_label, properties) in systems_key
         .as_hash()
         .expect("`systems` contains a single value, expected a collection of labels")
-        .iter()
     {
-        let label = label
+        let label = sys_label
             .as_str()
             // If the label cannot be parsed, then I'm not sure how to provide
             // precise feedback about it.
@@ -127,11 +129,7 @@ pub fn read_config(archive_root: &Path) -> Vec<System> {
         let system_path = archive_root.join(path);
         let path_error_msg = format!("system path `{}` does not exist", system_path.display());
 
-        assert!(
-            Path::new(&system_path).exists(),
-            "{}",
-            sys_error_msg(&path_error_msg)
-        );
+        assert!(system_path.exists(), "{}", sys_error_msg(&path_error_msg));
 
         let color_sys_error_msg: &str =
             &sys_error_msg("unexpected `color` value. Expected: `[u8, u8, u8]`");
