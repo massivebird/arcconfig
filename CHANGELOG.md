@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I'm new at this, so expect imperfection ;_; I'm trying!
 
+## Unreleased
+
+### Changed
+
++ __Breaking__: changed `read_config` parameter type to `&Path` from `&str`.
+
 ## [0.3.1] - 2024-02-24
 
 ### Changed
