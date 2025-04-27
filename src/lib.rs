@@ -1,5 +1,5 @@
-use colored::Colorize;
 use self::system::System;
+use colored::Colorize;
 use std::{fs, path::Path};
 use yaml_rust::YamlLoader;
 
@@ -65,100 +65,94 @@ pub mod system;
 ///   + Does not contain the expected fields.
 ///   + Contains a system with a nonexistent `path`.
 #[must_use]
-pub fn read_config(archive_root: &str) -> Vec<System> {
-    let error_msg = |msg: &str| -> String {
-        format!("archive config error: {msg}")
+pub fn read_config(archive_root: &Path) -> Vec<System> {
+    macro_rules! error_str {
+        ($($msg:tt)*) => {
+            format!("archive config error: {}", format!($($msg)*))
+        };
+    }
+
+    let yaml_contents = {
+        assert!(
+            archive_root.exists(),
+            "{}",
+            error_str!("path does not exist: {}", archive_root.display())
+        );
+
+        let yaml_path = archive_root.join("config.yaml");
+
+        fs::read_to_string(yaml_path)
+            .expect(&error_str!("`config.yaml` not found in archive root."))
     };
 
-    assert!(
-        Path::new(archive_root).exists(),
-        "{}", &error_msg(&format!("path does not exist: {archive_root}"))
-    );
-
-    let yaml_path = String::from(archive_root) + "/config.yaml";
-    let yaml_contents = fs::read_to_string(yaml_path).expect(
-        &error_msg(&format!("`config.yaml` not found in archive root."))
-    );
-
-    let systems_key = &YamlLoader::load_from_str(&yaml_contents).expect(
-        &error_msg(&format!("`config.yaml` could not be parsed."))
-    )[0]["systems"];
+    let systems_key = &YamlLoader::load_from_str(&yaml_contents)
+        .expect(&error_str!("`config.yaml` could not be parsed."))[0]["systems"];
 
     assert!(
         !systems_key.is_badvalue(),
-        "{}", &error_msg(&format!("`config.yaml` does not contain a `systems` key."))
+        "{}",
+        error_str!("`config.yaml` does not contain a `systems` key.")
     );
 
     let mut systems: Vec<System> = Vec::new();
 
-    // initializing this here to save indentation later
-    let declared_systems_iter = || {
-        systems_key
-            .as_hash()
-            .expect("`systems` contains a single value, expected a collection of labels")
-            .iter()
-    };
-
-    for (label, properties) in declared_systems_iter() {
-        let label = label
+    for (sys_label, properties) in systems_key
+        .as_hash()
+        .expect("`systems` contains a single value, expected a collection of labels")
+    {
+        let label = sys_label
             .as_str()
-            // if the label cannot be parsed, then I'm not sure how to provide
-            // precise feedback about it
+            // If the label cannot be parsed, then I'm not sure how to provide
+            // precise feedback about it. Sorry >w<
             .expect("archive config error: bad system label somewhere");
 
         let sys_error_msg = |msg: &str| -> String {
             format!("archive config error: system labeled `{label}`: {msg}")
         };
 
-        // macros enable parameterization of iterator adapters! See below:
+        // My magnum opus.
         macro_rules! extract_property {
             ( $property_name: expr, $converter: ident ) => {
                 properties[$property_name]
-                .$converter() // this adapter is provided as a parameter!
-                .expect(
-                &sys_error_msg(&format!("missing `{}` property", $property_name))
-                )
-            }
+                    .$converter() // Type converter fn provided by macro invocation
+                    .expect(&sys_error_msg(&format!(
+                        "missing `{}` property",
+                        $property_name
+                    )))
+            };
         }
 
-        let display_name   = extract_property!("display_name", as_str);
-        let color          = extract_property!("color", as_vec);
-        let path           = extract_property!("path", as_str);
+        let display_name = extract_property!("display_name", as_str);
+        let color = extract_property!("color", as_vec);
+        let path = extract_property!("path", as_str);
         let games_are_dirs = extract_property!("games_are_directories", as_bool);
 
-        let system_path = String::from(archive_root) + "/" + path;
-        let path_error_msg = format!("path `{path}` does not exist relative to archive root");
+        let system_path = archive_root.join(path);
+        let path_error_msg = format!("system path `{}` does not exist", system_path.display());
 
-        assert!(
-            Path::new(&system_path).exists(),
-            "{}", sys_error_msg(&path_error_msg)
-        );
+        assert!(system_path.exists(), "{}", sys_error_msg(&path_error_msg));
 
-        let color_sys_error_msg: &str = &sys_error_msg(
-            "unexpected `color` value. Expected: `[u8, u8, u8]`"
-        );
+        let color_sys_error_msg: &str =
+            &sys_error_msg("unexpected `color` value. Expected: `[u8, u8, u8]`");
 
         let nth_color = |n: usize| -> u8 {
-            u8::try_from(color
-                .get(n)
-                .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
-                .as_i64()
-                .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
-            ).unwrap_or_else(|_| panic!("{color_sys_error_msg}"))
+            u8::try_from(
+                color
+                    .get(n)
+                    // Panics if there are less than 3 values.
+                    .unwrap_or_else(|| panic!("{color_sys_error_msg}"))
+                    .as_i64()
+                    // Panics if a value could not be read as an i32.
+                    // (Can't directly convert from `Yaml` to `u32`)
+                    .unwrap_or_else(|| panic!("{color_sys_error_msg}")),
+            )
+            // Panics if `i32` cannot be converted to a `u32`.
+            .unwrap_or_else(|_| panic!("{color_sys_error_msg}"))
         };
 
-        let display_name = display_name.truecolor(
-            nth_color(0),
-            nth_color(1),
-            nth_color(2)
-        );
+        let display_name = display_name.truecolor(nth_color(0), nth_color(1), nth_color(2));
 
-        systems.push(System::new(
-            label,
-            display_name,
-            path,
-            games_are_dirs,
-        ));
+        systems.push(System::new(label, display_name, path, games_are_dirs));
     }
 
     systems
@@ -166,7 +160,7 @@ pub fn read_config(archive_root: &str) -> Vec<System> {
 
 #[cfg(test)]
 mod tests {
-    use yaml_rust::{YamlLoader, Yaml};
+    use yaml_rust::{Yaml, YamlLoader};
 
     const DEMO: &str = "
 systems:
@@ -201,7 +195,7 @@ systems:
     }
 
     #[test]
-    fn parse_path() {
+    fn parse_root() {
         let data = &YamlLoader::load_from_str(DEMO).unwrap()[0]["systems"];
         assert_eq!(data["gamecube"]["path"], Yaml::String("games".to_string()));
     }
@@ -216,5 +210,4 @@ systems:
     // fn read_real() {
     //     super::read_config("/home/penguino/game-archive");
     // }
-
 }
