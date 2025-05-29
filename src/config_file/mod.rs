@@ -1,4 +1,4 @@
-use self::error::{BadSystemLabelSomewhere, MissingProperty};
+use self::error::{BadSystemLabelSomewhere, MissingProperty, SystemDirNotFound};
 use crate::system::System;
 use std::{io, path::Path};
 use yaml_rust::Yaml;
@@ -110,9 +110,13 @@ impl<'a> ConfigFile<'a> {
             let games_are_dirs = extract_property!("games_are_directories", as_bool);
 
             let system_path = self.archive_root.join(path);
-            let path_error_msg = format!("system path `{}` does not exist", system_path.display());
 
-            assert!(system_path.exists(), "{}", sys_error_msg(&path_error_msg));
+            if !system_path.exists() || !system_path.is_dir() {
+                return_err!(SystemDirNotFound {
+                    sys_label: label.to_owned(),
+                    dir: system_path.to_string_lossy().into_owned(),
+                });
+            }
 
             let color_sys_error_msg: &str =
                 &sys_error_msg("unexpected `color` value. Expected: `[u8, u8, u8]`");

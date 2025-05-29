@@ -38,3 +38,28 @@ impl std::fmt::Display for MissingProperty {
 }
 
 impl std::error::Error for MissingProperty {}
+
+#[derive(Debug)]
+pub struct SystemDirNotFound {
+    pub sys_label: String,
+    pub dir: String,
+}
+
+impl SystemDirNotFound {
+    #[must_use]
+    pub const fn new(sys_label: String, dir: String) -> Self {
+        Self { sys_label, dir }
+    }
+}
+
+impl std::fmt::Display for SystemDirNotFound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{PREFIX} system dir `{}` not found for system labelled {}",
+            self.dir, self.sys_label
+        )
+    }
+}
+
+impl std::error::Error for SystemDirNotFound {}
