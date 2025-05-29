@@ -1,4 +1,4 @@
-use colored::ColoredString;
+use colored::Colorize;
 
 /// An abstraction over a game system.
 ///
@@ -12,7 +12,8 @@ use colored::ColoredString;
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
     pub label: String,
-    pub pretty_string: ColoredString,
+    pub display_name: String,
+    pub rgb: [u8; 3],
     pub directory: String,
     pub games_are_directories: bool,
 }
@@ -24,16 +25,26 @@ impl System {
     #[must_use]
     pub fn new(
         label: &str,
-        pretty_string: ColoredString,
+        display_name: &str,
+        rgb: [u8; 3],
         dir_name: &str,
         games_are_directories: bool,
     ) -> Self {
         Self {
             label: String::from(label),
+            display_name: String::from(display_name),
             directory: String::from(dir_name),
-            pretty_string,
+            rgb,
             games_are_directories,
         }
+    }
+}
+
+impl std::fmt::Display for System {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let rgb = self.rgb;
+
+        write!(f, "{}", self.display_name.truecolor(rgb[0], rgb[1], rgb[2]))
     }
 }
 
