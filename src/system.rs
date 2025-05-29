@@ -1,14 +1,6 @@
 use colored::Colorize;
 
 /// An abstraction over a game system.
-///
-/// # Properties
-///
-/// + `label`: An arbitrary system label for identifying this system.
-/// + `pretty_string`: A `colored::ColoredString` for output purposes.
-/// + `dir_name`: the directory in which this system's games are stored (relative to the
-///   archive root).
-/// + `games_are_directories`: are this system's games represented as directories?
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
     pub label: String,
