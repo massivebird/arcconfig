@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-I'm new at this, so expect imperfection ;_; I'm trying!
+## [0.5.0] - 2025-05-30
+
+### Changed
+
++ __Breaking__: the crate's entry point has been moved to `config_file::ConfigFile::from_archive`.
+  + Systems can now be built via the `ConfigFile::systems` function.
+  + Config file parsing and system building processes now return `Result`s in some places where it would previously panic.
++ __Breaking__: the `System::pretty_string` property has been moved to the `System::colored_string` function. Its components are now accessible through the `display_name` and `rgb` properties.
+
+### Added
+
++ Added custom error types defined in `config_file::error` for some fallible operations.
++ `System` now implements `std::fmt::Display`, writing the system's colored string to the buffer.
 
 ## [0.4.0] - 2025-04-27
 
