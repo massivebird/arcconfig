@@ -1,4 +1,4 @@
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 
 /// An abstraction over a game system. Built from the configuration file in the archive root.
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -30,13 +30,18 @@ impl System {
             games_are_directories,
         }
     }
+
+    #[must_use]
+    pub fn colored_string(&self) -> ColoredString {
+        let rgb = &self.rgb;
+
+        self.display_name.truecolor(rgb[0], rgb[1], rgb[2])
+    }
 }
 
 impl std::fmt::Display for System {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let rgb = self.rgb;
-
-        write!(f, "{}", self.display_name.truecolor(rgb[0], rgb[1], rgb[2]))
+        write!(f, "{}", self.colored_string())
     }
 }
 
