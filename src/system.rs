@@ -1,6 +1,6 @@
 use colored::Colorize;
 
-/// An abstraction over a game system.
+/// An abstraction over a game system. Built from the configuration file in the archive root.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct System {
     pub label: String,
