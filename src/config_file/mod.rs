@@ -21,7 +21,7 @@ impl<'a> ConfigFile<'a> {
     /// + The archive root does not exist, or
     /// + The archive root is not a directory, or
     /// + Failed to parse `config.yaml`.
-    pub fn in_archive(archive_root: &'a Path) -> io::Result<Self> {
+    pub fn from_archive(archive_root: &'a Path) -> io::Result<Self> {
         if !archive_root.exists() {
             return Err(io::Error::new(
                 io::ErrorKind::NotFound,
