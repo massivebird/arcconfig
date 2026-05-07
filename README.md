@@ -1,3 +1,8 @@
+> [!WARNING]
+> Arcconfig has been archived! Please check out arcconfig's successor, [bsrc](https://github.com/massivebird/bsrc)!
+>
+> Arcconfig will remain fully available on GitHub and crates.io, but I won't be updating it anymore.
+
 # arcconfig
 
 > short for "archive configuration"
